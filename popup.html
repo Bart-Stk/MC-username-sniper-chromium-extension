@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>MC Name Try-List</title>
+<style>
+  @font-face {
+    /* Local Minecraft Regular font bundled in the extension folder. */
+    font-family: "MCPixel";
+    src: url("MinecraftRegular-Bmg3.otf") format("opentype");
+    font-display: swap;
+  }
+
+  :root {
+    --mc-green: #37a13b;
+    --mc-green-dark: #3a8a3d;
+    --mc-green-bright: #37a13b;
+    --mc-panel: #1b1b1b;
+    --mc-panel-dark: #0f0f0f;
+    --mc-stone: #313131;
+    --mc-stone-light: #4a4a4a;
+    --mc-border-light: #6b6b6b;
+    --mc-border-dark: #000000;
+    --mc-red: #c53d3d;
+    --mc-text: #e2e2e2;
+    --mc-gold: #ffffff;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Body no longer draws the outer "frame" — only the .panel is visible. */
+  body {
+    width: 425px; /* 340px * 1.25 */
+    font-family: "MCPixel", "Segoe UI", Consolas, monospace;
+    background: transparent;
+  }
+
+  h1 {
+    font-size: 16px;
+    letter-spacing: 0.5px;
+    margin: 0 0 12px 0;
+    color: #ffffff;
+    text-align: center;
+  }
+
+  /* Minecraft-style lever/toggle switch */
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 52px;
+    height: 25px;
+    flex-shrink: 0;
+  }
+  .switch input { opacity: 0; width: 0; height: 0; }
+
+  input:checked + .slider::before {
+    transform: translateX(28px);
+    background: #207522;
+    border: 2px solid #228f27;
+}
+
+  input:checked + .slider {
+    background: #1a711d;
+}
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background: var(--mc-panel-dark);
+    border: 2px solid #3d3d3d;
+    box-shadow: inset 2px 2px 0 #232323, inset -2px -2px 0 #5b5b5b;
+    transition: background 0.1s;
+  }
+
+  .slider::before {
+    content: "";
+    position: absolute;
+    height: 13px;
+    width: 13px;
+    left: 2px;
+    top: 2px;
+    background: #656565;
+    border: 2px solid #7f7f7f;
+    transition: transform 0.1s;
+}
+
+  /* The panel IS the popup now — it carries the outer bevel that used to
+     live on <body>, so nothing renders around it. */
+  .panel {
+    position: relative;
+    background: var(--mc-stone);
+    border: 2px solid #353535;
+    box-shadow: inset 3px 3px 0 #2e2e2e, inset -3px -3px 0 #5b5b5b, inset 2px 2px 0 #232323;
+    padding: 12px 12px 22px 12px;
+  }
+
+  textarea {
+    width: 100%;
+    height: 138px; /* 110px * 1.25 */
+    background: var(--mc-panel-dark);
+    color: rgb(255, 255, 255);
+    border: 2px solid #393939;
+    box-shadow: inset 2px 2px 0 #232323, inset -2px -2px 0 #5b5b5b;
+    border-radius: 0;
+    padding: 8px;
+    font-family: "MCPixel";
+    font-size: 14px;
+    resize: vertical;
+  }
+  textarea:focus { outline: 2px solid #8b8b8b; }
+
+  /* Custom scrollbars (chromium) */
+  textarea::-webkit-scrollbar,
+  #log::-webkit-scrollbar,
+  html::-webkit-scrollbar {
+    width: 12px;
+  }
+  textarea::-webkit-scrollbar-track,
+  #log::-webkit-scrollbar-track,
+  html::-webkit-scrollbar-track {
+    background: none;
+
+  }
+  textarea::-webkit-scrollbar-thumb,
+  #log::-webkit-scrollbar-thumb,
+  html::-webkit-scrollbar-thumb {
+    background: var(--mc-stone-light);
+    border: 2px solid #0f0f0f;
+    box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.2);
+    
+  }
+
+  textarea::-webkit-scrollbar-corner,
+  #log::-webkit-scrollbar-corner,
+  html::-webkit-scrollbar-corner {
+    background: var(--mc-panel-dark);
+  }
+
+  /* The popup window itself has no background (body is transparent), so
+     give the html scrollbar track a solid backdrop instead of "none". */
+  html {
+    background: var(--mc-panel-dark);
+  }
+  html::-webkit-scrollbar-track {
+    background: var(--mc-panel-dark);
+  }
+
+  /* Custom "grip" for the textarea resize handle (bottom-right corner) */
+  textarea::-webkit-resizer {
+    background-color: #313131;
+    border: 2px solid #5b5b5b;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 12px;
+    font-size: 14px;
+  }
+
+  input[type="number"] {
+    width: 80px;
+    background: var(--mc-panel-dark);
+    color: var(--mc-text);
+    border: 2px solid #3d3d3d;
+    box-shadow: inset 2px 2px 0 #232323, inset -2px -2px 0 #5b5b5b;
+    padding: 4px 6px;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+  }
+  input[type="number"]:focus { outline: 2px solid #8b8b8b; }
+
+  .buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  button {
+    flex: 1;
+    padding: 10px 0;
+    border: 2px solid #414141;
+    box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.25), inset -2px -2px 0 rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    font-weight: bold;
+    font-family: inherit;
+    font-size: 14px;
+    text-transform: uppercase;
+    color: #fff;
+  }
+  button:active:not(:disabled) {
+    box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.25), inset -2px -2px 0 rgba(0, 0, 0, 0.5);
+  }
+
+  #startBtn { background: var(--mc-green); }
+  #startBtn:hover:not(:disabled) { background: #3fb344; text-shadow: none; }
+  #stopBtn { background: var(--mc-red); }
+  #stopBtn:hover:not(:disabled) { background: #e05555; }
+  #startBtn:disabled, #stopBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  label {
+    cursor: pointer;
+    color: white;
+}
+
+  /* Small arrow tab pinned to the bottom-right corner of the panel.
+     Clicking it reveals/hides the status + log section. */
+  #logToggle {
+    position: absolute;
+    right: 1px;
+    bottom: 1px;
+    width: 22px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: none;
+    border-right: none;
+    cursor: pointer;
+    user-select: none;
+    
+    /* New text styles for the '...' */
+    color: var(--mc-text); 
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    padding-bottom: 4px; /* Adjusts the dots so they look vertically centered */
+  }
+
+  #logWrap {
+    display: none;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 2px solid #393939;
+  }
+  #logWrap.open { display: block; }
+
+  .status {
+    font-size: 13px;
+    color: #ffffff;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+
+  #log {
+    height: 163px; /* 130px * 1.25 */
+    overflow-y: auto;
+    background: #0f0f0f;
+    border: 2px solid #313131;
+    box-shadow: inset 2px 2px 0 #232323, inset -2px -2px 0 #5b5b5b;
+    padding: 8px;
+    color: #ffffff;
+    font-size: 13px;
+    font-family: "MCPixel";
+    white-space: pre-wrap;
+    text-shadow: none;
+  }
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+
+
+</style>
+</head>
+<body>
+  <div class="panel">
+    <h1>Name sniper</h1>
+
+    <textarea id="names" placeholder="One name per line&#10;Notch&#10;Herobrine&#10;..."></textarea>
+
+    <div class="row">
+      <label for="delay">Delay between tries (ms)</label>
+      <input type="number" id="delay" min="0" step="100" value="400" />
+    </div>
+
+    <div class="row">
+      <label for="loop">Loop list until stopped</label>
+      <label class="switch">
+        <input type="checkbox" id="loop" />
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="row">
+      <label for="randomize">Randomize delay ±50%</label>
+      <label class="switch">
+        <input type="checkbox" id="randomize" />
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="buttons">
+      <button id="startBtn">Try All</button>
+      <button id="stopBtn" disabled>Stop</button>
+    </div>
+
+    <div id="logWrap">
+      <div class="status" id="status">Open your Minecraft profile page to begin.</div>
+      <div id="log"></div>
+    </div>
+
+    <div id="logToggle" title="Show/hide log">
+      <div id="logToggle" title="Show/hide log">...</div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

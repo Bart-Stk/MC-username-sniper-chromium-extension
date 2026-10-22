@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Name sniper by Bart-Stk",
+  "version": "1.0.0",
+  "icons": {
+    "8": "icon.png"
+   },
+  "description": "Paste a list of Minecraft Java names and auto-try them one by one on the official profile name-change page.",
+  "permissions": ["activeTab", "storage", "scripting"],
+  "host_permissions": ["https://www.minecraft.net/*"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "MC Name Try-List"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.minecraft.net/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
